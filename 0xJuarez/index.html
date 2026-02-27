@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0xJuarez</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #0b0b0b;
+  --white: #e8e2d4;
+  --red: #c0392b;
+  --green: #39ff14;
+  --dim: #2a2a2a;
+  --muted: #555;
+  --vt: 'VT323', monospace;
+  --cp: 'Courier Prime', monospace;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--cp);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* NOISE */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+  opacity: 0.45;
+}
+
+/* ═══════════════════════════
+   HEADER
+═══════════════════════════ */
+header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 800;
+  height: 48px;
+  background: var(--black);
+  border-bottom: 1px solid var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.2rem;
+}
+
+.logo-text {
+  font-family: var(--vt);
+  font-size: 1.5rem;
+  color: var(--red);
+  line-height: 1;
+  flex-shrink: 0;
+}
+.blink { animation: blink 1.1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Desktop nav */
+.desktop-nav {
+  display: flex;
+}
+.desktop-nav a {
+  font-family: var(--cp);
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0 0.85rem;
+  height: 48px;
+  display: flex; align-items: center;
+  border-left: 1px solid #1a1a1a;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.desktop-nav a:hover { color: var(--white); background: #161616; }
+
+/* Hamburger button */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px; height: 36px;
+  background: none;
+  border: 1px solid var(--dim);
+  cursor: pointer;
+  padding: 8px;
+  flex-shrink: 0;
+}
+.hamburger span {
+  display: block;
+  height: 1px;
+  background: var(--muted);
+  transition: all 0.25s;
+  transform-origin: center;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* Mobile menu drawer */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  top: 48px; left: 0; right: 0;
+  background: var(--black);
+  border-bottom: 1px solid var(--red);
+  z-index: 799;
+  flex-direction: column;
+}
+.mobile-nav.open { display: flex; }
+.mobile-nav a {
+  font-family: var(--cp);
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #141414;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 0.15s, background 0.15s;
+}
+.mobile-nav a:hover, .mobile-nav a:active { color: var(--red); background: #0d0808; }
+
+/* ═══════════════════════════
+   HERO
+═══════════════════════════ */
+.hero {
+  min-height: 100vh;
+  padding-top: 48px;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  grid-template-rows: repeat(30, 1fr);
+  opacity: 0.04;
+  pointer-events: none;
+}
+.hero-bg-char {
+  font-family: var(--vt);
+  font-size: 0.8rem;
+  color: var(--red);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+.hero-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 1.5rem 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-stamp {
+  font-family: var(--cp);
+  font-size: 0.6rem;
+  color: var(--red);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  opacity: 0.7;
+  line-height: 1.8;
+}
+
+.hero-name {
+  font-family: var(--vt);
+  font-size: clamp(4rem, 22vw, 14rem);
+  line-height: 0.85;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+}
+.hero-name::before,
+.hero-name::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  font-family: inherit; font-size: inherit; line-height: inherit;
+}
+.hero-name::before {
+  color: var(--red);
+  animation: glitch1 4.5s steps(1) infinite;
+  clip-path: polygon(0 20%, 100% 20%, 100% 35%, 0 35%);
+}
+.hero-name::after {
+  color: var(--green);
+  animation: glitch2 4.5s steps(1) infinite;
+  clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%);
+}
+@keyframes glitch1 {
+  0%,89%,100% { transform:none; opacity:0; }
+  90% { transform:translate(-4px,2px); opacity:0.8; }
+  92% { transform:translate(4px,-2px); opacity:0.6; }
+  94% { transform:translate(-2px,0); opacity:0; }
+}
+@keyframes glitch2 {
+  0%,85%,100% { transform:none; opacity:0; }
+  86% { transform:translate(3px,1px); opacity:0.5; }
+  88% { transform:translate(-3px,-1px); opacity:0.3; }
+  90% { opacity:0; }
+}
+
+.hero-sub {
+  margin-top: 1.2rem;
+  font-family: var(--cp);
+  font-size: 0.82rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  max-width: 480px;
+  line-height: 1.8;
+}
+.hero-sub em { color: var(--red); font-style: normal; }
+
+.hero-links {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--dim);
+  width: fit-content;
+  max-width: 100%;
+}
+.hero-links a {
+  font-family: var(--cp);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.6rem 1.1rem;
+  border-right: 1px solid var(--dim);
+  border-bottom: 1px solid var(--dim);
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.hero-links a:last-child { border-right: none; }
+.hero-links a:hover, .hero-links a:active { color: var(--red); background: #130a0a; }
+
+.hero-scroll {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--dim);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative; z-index: 2;
+}
+.hero-scroll span {
+  font-family: var(--vt);
+  font-size: 1rem;
+  color: var(--dim);
+  letter-spacing: 0.2em;
+  flex-shrink: 0;
+}
+.scroll-line {
+  flex: 1; height: 1px;
+  background: var(--dim);
+  position: relative; overflow: hidden;
+}
+.scroll-line::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--red), transparent);
+  animation: scanLine 3s linear infinite;
+}
+@keyframes scanLine { to { left: 200%; } }
+
+/* ═══════════════════════════
+   SECTION BASE
+═══════════════════════════ */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.raw-section {
+  padding: 4rem 0;
+  border-bottom: 1px solid #181818;
+  position: relative;
+}
+
+.raw-section .num {
+  font-family: var(--vt);
+  font-size: clamp(3rem, 10vw, 6rem);
+  color: #181818;
+  position: absolute;
+  right: 1.5rem;
+  top: 2.5rem;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.label {
+  font-family: var(--cp);
+  font-size: 0.62rem;
+  color: var(--red);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+.label::after { content: ''; flex: 1; height: 1px; background: #1e1e1e; }
+
+.raw-title {
+  font-family: var(--vt);
+  font-size: clamp(1.9rem, 6vw, 3.5rem);
+  color: var(--white);
+  line-height: 1.05;
+  margin-bottom: 2rem;
+}
+
+/* ═══════════════════════════
+   HISTORIA
+═══════════════════════════ */
+.historia-grid {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.historia-body p {
+  color: #888;
+  margin-bottom: 1.1rem;
+  font-size: 0.93rem;
+  line-height: 1.75;
+}
+.historia-body p strong { color: var(--white); }
+.historia-body p em { color: var(--red); font-style: italic; }
+
+.sidebar-box {
+  border: 1px solid #1e1e1e;
+  padding: 1.1rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+.sidebar-box::before {
+  content: attr(data-label);
+  font-family: var(--cp);
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  color: var(--red);
+  text-transform: uppercase;
+  position: absolute;
+  top: -0.5rem; left: 0.8rem;
+  background: var(--black);
+  padding: 0 0.3rem;
+}
+.sidebar-box ul { list-style: none; }
+.sidebar-box li {
+  font-family: var(--cp);
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.9;
+}
+.sidebar-box li::before { content: '– '; color: var(--red); }
+.sidebar-box > p {
+  font-family: var(--cp);
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.7;
+}
+
+/* ═══════════════════════════
+   PLATFORMS
+═══════════════════════════ */
+.platform-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--dim);
+}
+.platform-card {
+  padding: 1.8rem;
+  border-right: 1px solid var(--dim);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+.platform-card:last-child { border-right: none; }
+.platform-card:hover { background: #0f0f0f; }
+.platform-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 2px; height: 0;
+  background: var(--red);
+  transition: height 0.4s;
+}
+.platform-card:hover::before { height: 100%; }
+.pc-logo {
+  font-family: var(--vt);
+  font-size: 2.2rem;
+  color: var(--red);
+  margin-bottom: 0.3rem;
+  display: block;
+}
+.pc-name {
+  font-family: var(--cp);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.pc-desc { font-size: 0.82rem; color: #666; margin-bottom: 1.3rem; line-height: 1.6; }
+.pc-link {
+  font-family: var(--cp);
+  font-size: 0.7rem;
+  color: var(--red);
+  text-decoration: none;
+  border-bottom: 1px solid var(--red);
+  padding-bottom: 1px;
+}
+
+/* ═══════════════════════════
+   HACKATHON
+═══════════════════════════ */
+.hack-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.4rem 0;
+  border-bottom: 1px solid #141414;
+}
+.hack-year { font-family: var(--vt); font-size: 1.8rem; color: var(--red); min-width: 70px; }
+.hack-name { font-family: var(--cp); font-size: 0.9rem; color: var(--white); flex: 1; }
+.hack-status {
+  font-family: var(--cp);
+  font-size: 0.62rem;
+  color: var(--green);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: 1px solid var(--green);
+  padding: 0.2rem 0.55rem;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════
+   TEAM
+═══════════════════════════ */
+.team-display {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  border: 1px solid var(--dim);
+}
+.team-name-col {
+  border-right: 1px solid var(--dim);
+  padding: 1.8rem;
+  display: flex; align-items: flex-end;
+  min-height: 180px;
+}
+.team-name-col span {
+  font-family: var(--vt);
+  font-size: 1.9rem;
+  color: var(--red);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  letter-spacing: 0.05em;
+}
+.team-info { padding: 1.8rem; }
+.team-info p { font-size: 0.85rem; color: #666; margin-bottom: 1rem; line-height: 1.7; }
+.team-members {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid #1a1a1a;
+}
+.member {
+  font-family: var(--cp);
+  font-size: 0.75rem;
+  color: #555;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #141414;
+}
+.member::before { content: '→ '; color: var(--red); }
+
+/* ═══════════════════════════
+   CERTS
+═══════════════════════════ */
+.cert-table { width: 100%; border-collapse: collapse; }
+.cert-table tr { border-bottom: 1px solid #161616; transition: background 0.15s; }
+.cert-table tr:hover { background: #0d0d0d; }
+.cert-table td { padding: 0.9rem 0.5rem; font-size: 0.84rem; color: #666; vertical-align: top; }
+.cert-table td:first-child {
+  font-family: var(--vt);
+  font-size: 1.1rem;
+  color: var(--red);
+  width: 36px;
+  padding-left: 0;
+  white-space: nowrap;
+}
+.cert-table td strong { color: var(--white); display: block; font-size: 0.88rem; margin-bottom: 0.1rem; }
+
+/* ═══════════════════════════
+   SOCIAL
+═══════════════════════════ */
+.social-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 1px solid var(--dim);
+}
+.soc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.6rem 0.5rem;
+  text-decoration: none;
+  border-right: 1px solid var(--dim);
+  color: var(--muted);
+  transition: all 0.2s;
+  font-family: var(--cp);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.soc:last-child { border-right: none; }
+.soc:hover, .soc:active { color: var(--red); background: #0d0808; }
+.soc svg { width: 18px; height: 18px; fill: currentColor; opacity: 0.5; transition: opacity 0.2s; }
+.soc:hover svg, .soc:active svg { opacity: 1; }
+
+/* ═══════════════════════════
+   FOOTER
+═══════════════════════════ */
+footer {
+  border-top: 1px solid #161616;
+  padding: 1.8rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+footer p { font-family: var(--vt); font-size: 1rem; color: #2a2a2a; }
+footer .right { font-family: var(--cp); font-size: 0.62rem; color: #2a2a2a; letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* ═══════════════════════════
+   TABLET  ≤ 900px
+═══════════════════════════ */
+@media (max-width: 900px) {
+  .desktop-nav a { padding: 0 0.6rem; font-size: 0.6rem; }
+  .historia-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .historia-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .sidebar-box { margin-bottom: 0; }
+  .social-row { grid-template-columns: repeat(3, 1fr); }
+  .soc:nth-child(3) { border-right: none; }
+  .soc:nth-child(4) { border-right: 1px solid var(--dim); }
+  .soc:nth-child(4), .soc:nth-child(5) { border-top: 1px solid var(--dim); }
+}
+
+/* ═══════════════════════════
+   MOBILE  ≤ 640px
+═══════════════════════════ */
+@media (max-width: 640px) {
+  /* Swap nav */
+  .desktop-nav { display: none; }
+  .hamburger { display: flex; }
+
+  /* Hero */
+  .hero-stamp { font-size: 0.55rem; letter-spacing: 0.15em; }
+  .hero-inner { padding: 2.5rem 1.2rem 1.5rem; }
+  .hero-scroll { padding: 0.9rem 1.2rem; }
+  .hero-links { border: none; }
+  .hero-links a {
+    border: 1px solid var(--dim);
+    margin: 0 0.3rem 0.3rem 0;
+    border-radius: 0;
+  }
+
+  /* Sections */
+  .page { padding: 0 1.2rem; }
+  .raw-section { padding: 3rem 0; }
+  .raw-section .num { display: none; }
+  .label { font-size: 0.58rem; letter-spacing: 0.2em; }
+
+  /* Historia sidebar: stacked single col */
+  .historia-sidebar { display: flex; flex-direction: column; gap: 0.8rem; }
+
+  /* Platforms: stacked */
+  .platform-row { grid-template-columns: 1fr; }
+  .platform-card {
+    border-right: none;
+    border-bottom: 1px solid var(--dim);
+  }
+  .platform-card:last-child { border-bottom: none; }
+
+  /* Hackathon row wrap */
+  .hack-name { min-width: 100%; order: 3; margin-top: -0.5rem; }
+  .hack-status { order: 2; }
+
+  /* Team: hide vertical label col */
+  .team-display { grid-template-columns: 1fr; }
+  .team-name-col { display: none; }
+  .team-members { grid-template-columns: 1fr; }
+
+  /* Certs table */
+  .cert-table td { font-size: 0.8rem; padding: 0.8rem 0.3rem; }
+  .cert-table td:first-child { font-size: 0.9rem; width: 28px; }
+
+  /* Social: 3 cols then 2 */
+  .social-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .soc { padding: 1.2rem 0.3rem; font-size: 0.55rem; gap: 0.4rem; }
+  .soc svg { width: 16px; height: 16px; }
+  .soc:nth-child(3) { border-right: none; }
+  .soc:nth-child(4), .soc:nth-child(5) {
+    border-top: 1px solid var(--dim);
+    border-right: 1px solid var(--dim);
+  }
+  .soc:nth-child(5) { border-right: none; }
+
+  /* Footer */
+  footer { flex-direction: column; text-align: center; padding: 1.5rem 1.2rem; }
+}
+
+/* ═══════════════════════════
+   TINY  ≤ 380px
+═══════════════════════════ */
+@media (max-width: 380px) {
+  .hero-links a { font-size: 0.6rem; padding: 0.5rem 0.8rem; }
+  .hero-sub { font-size: 0.78rem; }
+  .raw-title { font-size: 1.7rem; }
+  .platform-card { padding: 1.3rem; }
+  .cert-table td { font-size: 0.75rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-text">0xJuarez<span class="blink">_</span></div>
+  <nav class="desktop-nav">
+    <a href="#historia">Historia</a>
+    <a href="#plataformas">HTB/THM</a>
+    <a href="#hackathons">Hackathones</a>
+    <a href="#equipo">Equipo</a>
+    <a href="#certs">Certs</a>
+    <a href="#contact">Redes</a>
+  </nav>
+  <button class="hamburger" id="menuBtn" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- MOBILE MENU -->
+<nav class="mobile-nav" id="mobileNav">
+  <a href="#historia"    onclick="closeMenu()">Historia</a>
+  <a href="#plataformas" onclick="closeMenu()">HTB / TryHackMe</a>
+  <a href="#hackathons"  onclick="closeMenu()">Hackathones</a>
+  <a href="#equipo"      onclick="closeMenu()">Equipo</a>
+  <a href="#certs"       onclick="closeMenu()">Certificaciones</a>
+  <a href="#contact"     onclick="closeMenu()">Redes</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-inner">
+    <p class="hero-stamp">México · Offensive Security · DevSecurity · Est. 2025</p>
+    <h1 class="hero-name" data-text="0xJuarez">0xJuarez</h1>
+    <p class="hero-sub">
+      <em>Jesús Juárez.</em> Hacking ético · CTF competitor · Digital underground.<br>
+      Privesc · Exploitation · Infrastructure Analysis.
+    </p>
+    <div class="hero-links">
+      <a href="#historia">$ whoami</a>
+      <a href="https://app.hackthebox.com/public/users/2806180" target="_blank" rel="noopener">HTB</a>
+      <a href="https://tryhackme.com/p/0xJuarez" target="_blank" rel="noopener">TryHackMe</a>
+      <a href="https://github.com/0xjuarez" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+    <span>↓</span>
+  </div>
+</section>
+
+<!-- HISTORIA -->
+<section id="historia" class="raw-section">
+  <div class="page">
+    <span class="num" aria-hidden="true">01</span>
+    <p class="label">Mi Historia</p>
+    <h2 class="raw-title">Desde las sombras<br>del internet temprano</h2>
+    <div class="historia-grid">
+      <div class="historia-body">
+        <p>
+          No empecé con libros ni cursos. Empecé donde aprendía la gente real:
+          <em>4chan, Doxbin, /g/, foros de exploits anónimos, canales de IRC sin nombre.</em>
+          Lugares donde nadie pedía credenciales y todo se aprendía observando, fallando, intentando de nuevo.
+        </p>
+        <p>
+          Desde niño modificaba videojuegos para <strong>alterar su comportamiento</strong>,
+          desmontaba dispositivos electrónicos y los reconstruía por pura curiosidad.
+          Esa compulsión de entender cómo funciona algo por dentro — y cómo romperlo — nunca desapareció.
+        </p>
+        <p>
+          Lo que encontré en esos foros fue caótico, muchas veces oscuro, pero
+          <em>genuinamente educativo</em>. Aprendí sobre anonimato, OPSEC básico,
+          ingeniería social y las grietas de la infraestructura digital antes de que
+          existiera un roadmap que me lo explicara.
+        </p>
+        <p>
+          Después vinieron los hackeos reales — contra mí. Sistemas comprometidos durante
+          la adolescencia que me obligaron a entender el otro lado. Esa experiencia fue el
+          origen de <strong>DevSecurity</strong>.
+        </p>
+        <p>
+          Hoy compito en CTFs, participo en hackathones y perfecciono mis habilidades en
+          explotación, privesc y análisis de infraestructura. El underground no desaparece —
+          se convierte en perspectiva.
+        </p>
+      </div>
+      <div class="historia-sidebar">
+        <div class="sidebar-box" data-label="Orígenes">
+          <ul>
+            <li>4chan /g/ /b/</li>
+            <li>Doxbin</li>
+            <li>IRC sin nombre</li>
+            <li>Foros de exploits</li>
+            <li>Comunidades anónimas</li>
+          </ul>
+        </div>
+        <div class="sidebar-box" data-label="Especialidades">
+          <ul>
+            <li>Privilege Escalation</li>
+            <li>Exploitation</li>
+            <li>OPSEC</li>
+            <li>Infraestructura</li>
+            <li>Social Engineering</li>
+          </ul>
+        </div>
+        <div class="sidebar-box" data-label="Fundador">
+          <p>DevSecurity — empresa nacida del aprendizaje a fuerza de golpes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATAFORMAS -->
+<section id="plataformas" class="raw-section">
+  <div class="page">
+    <span class="num" aria-hidden="true">02</span>
+    <p class="label">Plataformas</p>
+    <h2 class="raw-title">Training Ground</h2>
+    <div class="platform-row">
+      <div class="platform-card">
+        <span class="pc-logo">HTB</span>
+        <p class="pc-name">Hack The Box</p>
+        <p class="pc-desc">Plataforma principal. Máquinas realistas, entornos Active Directory, Pro Labs. Donde se calibra el nivel real.</p>
+        <a href="https://app.hackthebox.com/public/users/2806180" target="_blank" rel="noopener" class="pc-link">Ver perfil →</a>
+      </div>
+      <div class="platform-card">
+        <span class="pc-logo">THM</span>
+        <p class="pc-name">TryHackMe</p>
+        <p class="pc-desc">Rutas Red Team, rooms guiadas, entornos de aprendizaje estructurado. Complemento activo de práctica.</p>
+        <a href="https://tryhackme.com/p/0xJuarez" target="_blank" rel="noopener" class="pc-link">Ver perfil →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HACKATHONS -->
+<section id="hackathons" class="raw-section">
+  <div class="page">
+    <span class="num" aria-hidden="true">03</span>
+    <p class="label">Competencias</p>
+    <h2 class="raw-title">Hackathones</h2>
+    <div class="hack-row">
+      <span class="hack-year">2025</span>
+      <span class="hack-name">Tech Talents</span>
+      <span class="hack-status">✓ Participó</span>
+    </div>
+  </div>
+</section>
+
+<!-- EQUIPO -->
+<section id="equipo" class="raw-section">
+  <div class="page">
+    <span class="num" aria-hidden="true">04</span>
+    <p class="label">Equipo</p>
+    <h2 class="raw-title">BinaryBounty</h2>
+    <div class="team-display">
+      <div class="team-name-col">
+        <span>BINARYBOUNTY</span>
+      </div>
+      <div class="team-info">
+        <p>Equipo de 4 integrantes con perfiles complementarios: desde educación y teoría hasta hacking ofensivo aplicado.</p>
+        <div class="team-members">
+          <span class="member">Profesor (×2)</span>
+          <span class="member">Ing. Industrial</span>
+          <span class="member">Ing. IA</span>
+          <span class="member">Hacking Ético — 0xJuarez</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTS -->
+<section id="certs" class="raw-section">
+  <div class="page">
+    <span class="num" aria-hidden="true">05</span>
+    <p class="label">Certificaciones</p>
+    <h2 class="raw-title">Credenciales</h2>
+    <table class="cert-table">
+      <tr>
+        <td>01</td>
+        <td><strong>Introducción a la Ciberseguridad</strong>CCNA · Cisco Networking Academy</td>
+      </tr>
+      <tr>
+        <td>02</td>
+        <td><strong>Introducción a las Redes</strong>CCNA · Cisco Networking Academy</td>
+      </tr>
+      <tr>
+        <td>03</td>
+        <td><strong>NDG Linux Unhatched Spanish</strong>CCNA · Cisco Networking Academy</td>
+      </tr>
+      <tr>
+        <td>04</td>
+        <td><strong>Carrera Profesional de Analista Junior en Ciberseguridad</strong>CCNA · Cisco Networking Academy</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="raw-section" style="border-bottom:none;">
+  <div class="page">
+    <span class="num" aria-hidden="true">06</span>
+    <p class="label">Contacto & Redes</p>
+    <h2 class="raw-title">Encuéntrame</h2>
+    <div class="social-row">
+      <a href="https://www.facebook.com/profile.php?id=61584451625692" target="_blank" rel="noopener" class="soc">
+        <svg viewBox="0 0 24 24"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
+        Facebook
+      </a>
+      <a href="https://github.com/0xjuarez" target="_blank" rel="noopener" class="soc">
+        <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        GitHub
+      </a>
+      <a href="https://app.hackthebox.com/public/users/2806180" target="_blank" rel="noopener" class="soc">
+        <svg viewBox="0 0 24 24"><path d="M11.996 0L3 4.8v14.4l8.996 4.8L21 19.2V4.8zm0 2.236l7.004 3.735v1.9l-7.004 3.735L4.992 7.87V5.97zm-7.004 5.53l6.004 3.202v6.404L4.992 14.17zm8.004 9.606v-6.404l6.004-3.202v6.404z"/></svg>
+        HTB
+      </a>
+      <a href="https://tryhackme.com/p/0xJuarez" target="_blank" rel="noopener" class="soc">
+        <svg viewBox="0 0 24 24"><path d="M10.705 0C7.54 0 4.902 2.16 4.175 5.098A4.41 4.41 0 000 9.41c0 2.436 1.974 4.41 4.41 4.41h6.295V0zm-4.41 11.133a1.723 1.723 0 110-3.446 1.723 1.723 0 010 3.446zm7.81 2.457H7.81V24h6.295c3.167 0 5.803-2.16 6.53-5.098A4.41 4.41 0 0024 14.59c0-2.437-1.974-4.41-4.41-4.41h-.002zM19.59 15.6a1.723 1.723 0 110 3.446 1.723 1.723 0 010-3.446z"/></svg>
+        TryHackMe
+      </a>
+      <a href="https://www.instagram.com/sxldw/" target="_blank" rel="noopener" class="soc">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        Instagram
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>0xJuarez · <span id="yr"></span></p>
+  <span class="right">DevSecurity · Offensive Security · México</span>
+</footer>
+
+<script>
+// Year
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+// Hamburger menu
+const btn = document.getElementById('menuBtn');
+const nav = document.getElementById('mobileNav');
+btn.addEventListener('click', () => {
+  const open = nav.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open);
+});
+function closeMenu() {
+  nav.classList.remove('open');
+  btn.classList.remove('open');
+}
+// Close on outside click
+document.addEventListener('click', e => {
+  if (!btn.contains(e.target) && !nav.contains(e.target)) closeMenu();
+});
+
+// Hero BG — fewer cells on mobile for perf
+const isMobile = window.innerWidth <= 640;
+const cols = isMobile ? 20 : 20;
+const rows = isMobile ? 30 : 30;
+const chars = '01アイウエオ∑∂∇∈≠≤≥ψΩ{}[]<>/\\|#@!%^*&';
+const bg = document.getElementById('heroBg');
+for (let i = 0; i < cols * rows; i++) {
+  const el = document.createElement('div');
+  el.className = 'hero-bg-char';
+  el.textContent = chars[Math.floor(Math.random() * chars.length)];
+  setInterval(() => {
+    if (Math.random() < 0.012) el.textContent = chars[Math.floor(Math.random() * chars.length)];
+  }, 700 + Math.random() * 900);
+  bg.appendChild(el);
+}
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.06 });
+
+document.querySelectorAll(
+  '.raw-title, .historia-body p, .sidebar-box, .platform-card, .hack-row, .cert-table tr, .team-display, .social-row'
+).forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(16px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
