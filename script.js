@@ -1,110 +1,55 @@
-// Insertar el año actual en el footer
-document.addEventListener('DOMContentLoaded', function() {
-    const currentYear = new Date().getFullYear();
-    const yearElement = document.getElementById('year');
-    if (yearElement) {
-        yearElement.textContent = `© ${currentYear} 0xJuarez — No system is secure.`;
-    }
-    
-    // Cargar datos de HTB
-    loadHTBProfile();
+// Year
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+// Hamburger menu
+const btn = document.getElementById('menuBtn');
+const nav = document.getElementById('mobileNav');
+btn.addEventListener('click', () => {
+  const open = nav.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open);
+});
+function closeMenu() {
+  nav.classList.remove('open');
+  btn.classList.remove('open');
+}
+// Close on outside click
+document.addEventListener('click', e => {
+  if (!btn.contains(e.target) && !nav.contains(e.target)) closeMenu();
 });
 
-// Función para cargar el perfil de HTB
-async function loadHTBProfile() {
-    const statsContainer = document.getElementById('htb-stats');
-    const userId = '2806180';
-    
-    try {
-        // Intentar obtener datos del perfil de HackTheBox
-        // La API pública de HTB puede tener limitaciones
-        const response = await fetch(`https://www.hackthebox.com/api/v4/user/profile/basic?user_id=${userId}`, {
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            displayHTBStats(data);
-        } else {
-            // Si la API no funciona, mostrar datos alternativos
-            displayDefaultHTBStats();
-        }
-    } catch (error) {
-        // Si hay error de CORS u otro, mostrar datos alternativos
-        console.log('No se pudo cargar datos de HTB de forma automática');
-        displayDefaultHTBStats();
-    }
+// Hero BG — fewer cells on mobile for perf
+const isMobile = window.innerWidth <= 640;
+const cols = isMobile ? 20 : 20;
+const rows = isMobile ? 30 : 30;
+const chars = '01アイウエオ∑∂∇∈≠≤≥ψΩ{}[]<>/\\|#@!%^*&';
+const bg = document.getElementById('heroBg');
+for (let i = 0; i < cols * rows; i++) {
+  const el = document.createElement('div');
+  el.className = 'hero-bg-char';
+  el.textContent = chars[Math.floor(Math.random() * chars.length)];
+  setInterval(() => {
+    if (Math.random() < 0.012) el.textContent = chars[Math.floor(Math.random() * chars.length)];
+  }, 700 + Math.random() * 900);
+  bg.appendChild(el);
 }
 
-// Función para mostrar estadísticas de HTB
-function displayHTBStats(data) {
-    const statsContainer = document.getElementById('htb-stats');
-    
-    // Construir HTML con los datos disponibles
-    let html = '<div class="htb-stats-display">';
-    
-    if (data.profile && data.profile.rank) {
-        html += `
-            <div class="htb-stat">
-                <div class="htb-stat-value">${data.profile.rank}</div>
-                <div class="htb-stat-label">Ranking</div>
-            </div>
-        `;
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+      obs.unobserve(e.target);
     }
-    
-    if (data.profile && data.profile.owned_machines) {
-        html += `
-            <div class="htb-stat">
-                <div class="htb-stat-value">${data.profile.owned_machines}</div>
-                <div class="htb-stat-label">Máquinas</div>
-            </div>
-        `;
-    }
-    
-    if (data.profile && data.profile.owned_challenges) {
-        html += `
-            <div class="htb-stat">
-                <div class="htb-stat-value">${data.profile.owned_challenges}</div>
-                <div class="htb-stat-label">Retos</div>
-            </div>
-        `;
-    }
-    
-    html += '</div>';
-    
-    if (html.includes('htb-stat')) {
-        statsContainer.innerHTML = html;
-    } else {
-        displayDefaultHTBStats();
-    }
-}
+  });
+}, { threshold: 0.06 });
 
-// Función para mostrar estadísticas por defecto
-function displayDefaultHTBStats() {
-    const statsContainer = document.getElementById('htb-stats');
-    statsContainer.innerHTML = `
-        <div class="htb-default-message">
-            <p><i class=\"fas fa-info-circle\"></i> Perfil de HTB activo</p>
-            <p style=\"font-size: 11px; color: #777; margin-top: 10px;\">Id: 2806180</p>
-            <p style=\"font-size: 12px; margin-top: 15px;\">Ranking, máquinas comprometidas, retos completados y progreso documentado en tu perfil público.</p>
-        </div>
-    `;
-}
-
-// Smooth scroll para los enlaces de navegación
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href');
-        const targetElement = document.querySelector(targetId);
-        
-        if (targetElement) {
-            targetElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
+document.querySelectorAll(
+  '.raw-title, .historia-body p, .sidebar-box, .platform-card, .hack-row, .cert-table tr, .team-display, .social-row'
+).forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(16px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  obs.observe(el);
 });
